@@ -1,88 +1,101 @@
-import React, { Component } from 'react';
-import Navbar from '../navbar/Navbar';
-import axios from 'axios';
-class create extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            email: '',
-            name: '',
-            password: ''
-        }
-        this.handleEmailInputChange = this.handleEmailInputChange.bind(this);
-        this.handleNameInputChange = this.handleNameInputChange.bind(this);
-        this.handlePassInputChange = this.handlePassInputChange.bind(this);
-        this.handleFormSubmit = this.handleFormSubmit.bind(this);
-    }
-    handleNameInputChange(event) {
-        this.setState({ name: event.target.value })
-    }
-    handleEmailInputChange(event) {
-        this.setState(
-            {
-                email: event.target.value
-            }
-        )
-    }
-    handlePassInputChange(event) {
-        this.setState({ password: event.target.value })
-    }
-    handleFormSubmit(event) {
-        event.preventDefault();
-        axios.post('http://127.0.0.1:8000/api/submit', {
-            email: this.state.email,
-            name: this.state.name,
-            password: this.state.password
-        })
-            .then(response => {
-                
-                this.setState({
-                    name: '',
-                    email: '',
-                    password: ''
-                })
-                this.props.history.push('/');
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }
-    render() {
-        return (
-            <div>
-                <Navbar></Navbar>
-                <form>
-                    <div className="form">
-                        <div className="mb-3">
-                            <label for="exampleFormControlInput1" className="form-label">Email address</label>
-                            <input type="email" className="form-control" placeholder="name@example.com"
-                                onChange={this.handleEmailInputChange}
-                                value={this.state.email}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label for="exampleFormControlInput1" className="form-label">Name</label>
-                            <input type="name" className="form-control" placeholder="Enter Name"
-                                onChange={this.handleNameInputChange}
-                                value={this.state.name}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label for="exampleFormControlInput1" className="form-label">Password</label>
-                            <input type="password" className="form-control" placeholder="Enter Password"
-                                onChange={this.handlePassInputChange}
-                                value={this.state.password}
-                                required
-                            />
-                        </div>
-                        <button type="submit" className='btn btn-primary' onClick={this.handleFormSubmit}>Submit</button>
-                    </div>
-                </form>
-            </div>
-        );
-    }
-}
+import { useState } from 'react';
 
-export default create;
+export default function Create() {
+
+// States for registration
+const [name, setName] = useState('');
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+
+// States for checking the errors
+const [submitted, setSubmitted] = useState(false);
+const [error, setError] = useState(false);
+
+// Handling the name change
+const handleName = (e) => {
+	setName(e.target.value);
+	setSubmitted(false);
+};
+
+// Handling the email change
+const handleEmail = (e) => {
+	setEmail(e.target.value);
+	setSubmitted(false);
+};
+
+// Handling the password change
+const handlePassword = (e) => {
+	setPassword(e.target.value);
+	setSubmitted(false);
+};
+
+// Handling the form submission
+const handleSubmit = (e) => {
+	e.preventDefault();
+	if (name === '' || email === '' || password === '') {
+	setError(true);
+	} else {
+	setSubmitted(true);
+	setError(false);
+	}
+};
+
+// Showing success message
+const successMessage = () => {
+	return (
+	<div
+		className="success"
+		style={{
+		display: submitted ? '' : 'none',
+		}}>
+		<h1>User {name} successfully registered!!</h1>
+	</div>
+	);
+};
+
+// Showing error message if error is true
+const errorMessage = () => {
+	return (
+	<div
+		className="error"
+		style={{
+		display: error ? '' : 'none',
+		}}>
+		<h1>Please enter all the fields</h1>
+	</div>
+	);
+};
+
+return (
+	<div className="form">
+	<div>
+		<h1>User Registration</h1>
+	</div>
+
+	{/* Calling to the methods */}
+	<div className="messages">
+		{errorMessage()}
+		{successMessage()}
+	</div>
+
+	<form>
+		{/* Labels and inputs for form data */}
+		<label className="label">Name</label>
+		<input onChange={handleName} className="input"
+		value={name} type="text" />
+
+		<label className="label">Email</label>
+		<input onChange={handleEmail} className="input"
+		value={email} type="email" />
+
+		<label className="label">Password</label>
+		<input onChange={handlePassword} className="input"
+		value={password} type="password" />
+
+		<button onClick={handleSubmit} className="btn" type="submit">
+		Submit
+		</button>
+	</form>
+	</div>
+);
+}
